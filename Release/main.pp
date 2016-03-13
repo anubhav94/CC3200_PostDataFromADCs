@@ -18,8 +18,11 @@ main.obj: C:/TI/CC3200SDK_1.1.0/cc3200-sdk/simplelink/include/device.h
 main.obj: C:/TI/CC3200SDK_1.1.0/cc3200-sdk/simplelink/include/netcfg.h
 main.obj: C:/TI/CC3200SDK_1.1.0/cc3200-sdk/simplelink/include/wlan_rx_filters.h
 main.obj: C:/TI/CC3200SDK_1.1.0/cc3200-sdk/simplelink/include/../source/nonos.h
+main.obj: C:/TI/CC3200SDK_1.1.0/cc3200-sdk/inc/hw_memmap.h
 main.obj: C:/TI/CC3200SDK_1.1.0/cc3200-sdk/inc/hw_ints.h
 main.obj: C:/TI/CC3200SDK_1.1.0/cc3200-sdk/inc/hw_types.h
+main.obj: C:/TI/CC3200SDK_1.1.0/cc3200-sdk/inc/hw_common_reg.h
+main.obj: C:/TI/CC3200SDK_1.1.0/cc3200-sdk/driverlib/spi.h
 main.obj: C:/TI/CC3200SDK_1.1.0/cc3200-sdk/driverlib/rom.h
 main.obj: C:/TI/CC3200SDK_1.1.0/cc3200-sdk/driverlib/rom_map.h
 main.obj: C:/TI/CC3200SDK_1.1.0/cc3200-sdk/driverlib/rom_patch.h
@@ -66,8 +69,11 @@ C:/TI/CC3200SDK_1.1.0/cc3200-sdk/simplelink/include/device.h:
 C:/TI/CC3200SDK_1.1.0/cc3200-sdk/simplelink/include/netcfg.h: 
 C:/TI/CC3200SDK_1.1.0/cc3200-sdk/simplelink/include/wlan_rx_filters.h: 
 C:/TI/CC3200SDK_1.1.0/cc3200-sdk/simplelink/include/../source/nonos.h: 
+C:/TI/CC3200SDK_1.1.0/cc3200-sdk/inc/hw_memmap.h: 
 C:/TI/CC3200SDK_1.1.0/cc3200-sdk/inc/hw_ints.h: 
 C:/TI/CC3200SDK_1.1.0/cc3200-sdk/inc/hw_types.h: 
+C:/TI/CC3200SDK_1.1.0/cc3200-sdk/inc/hw_common_reg.h: 
+C:/TI/CC3200SDK_1.1.0/cc3200-sdk/driverlib/spi.h: 
 C:/TI/CC3200SDK_1.1.0/cc3200-sdk/driverlib/rom.h: 
 C:/TI/CC3200SDK_1.1.0/cc3200-sdk/driverlib/rom_map.h: 
 C:/TI/CC3200SDK_1.1.0/cc3200-sdk/driverlib/rom_patch.h: 
