@@ -60,6 +60,8 @@ PinMuxConfig(void)
     //
     MAP_PRCMPeripheralClkEnable(PRCM_UARTA0, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkEnable(PRCM_GSPI, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_GPIOA1, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_GPIOA2, PRCM_RUN_MODE_CLK);
 
 
     //
@@ -72,6 +74,25 @@ PinMuxConfig(void)
     //
     MAP_PinTypeUART(PIN_57, PIN_MODE_3);
 
+    // Used this  https://e2e.ti.com/support/wireless_connectivity/simplelink_wifi_cc31xx_cc32xx/f/968/p/398817/1413841
+    // and this  https://e2e.ti.com/support/wireless_connectivity/simplelink_wifi_cc31xx_cc32xx/f/968/p/352502/1235819#1235819
+    // to figure out how to do GPIODirModeSet for pins 3,4,7
+    // GPIOA1.2	Device Pin 1 MOD Pin 3
+    // GPIOA1.3	Device Pin 2 MOD Pin 4
+    // Pins 3,4,7 interact with FPGA.
+    // FPGA emulates SPI interface over 5,6,8
+    // Pin 3 = Done
+    MAP_PinTypeGPIO(PIN_01, PIN_MODE_0, false);
+    MAP_GPIODirModeSet(GPIOA1_BASE, GPIO_PIN_2, GPIO_DIR_MODE_IN);
+    // Pin 4 = Start
+    MAP_PinTypeGPIO(PIN_02, PIN_MODE_0, false);
+    MAP_GPIODirModeSet(GPIOA1_BASE, GPIO_PIN_3, GPIO_DIR_MODE_OUT);
+
+    // Pin 7 = Reset
+    MAP_PinTypeGPIO(PIN_07, PIN_MODE_0, false);
+    MAP_GPIODirModeSet(GPIOA2_BASE, GPIO_PIN_0, GPIO_DIR_MODE_OUT);
+
+
 
     // Configure PIN_05 for SPI0 GSPI_CLK
     //
@@ -82,10 +103,11 @@ PinMuxConfig(void)
     //
     MAP_PinTypeSPI(PIN_06, PIN_MODE_7);
 
+    // TODO XXX Delete below
     //
     // Configure PIN_07 for SPI0 GSPI_MOSI
     //
-    MAP_PinTypeSPI(PIN_07, PIN_MODE_7);
+//    MAP_PinTypeSPI(PIN_07, PIN_MODE_7);
 
     //
     // Configure PIN_08 for SPI0 GSPI_CS

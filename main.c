@@ -65,6 +65,7 @@
 
 // common interface includes
 #include "uart_if.h"
+#include "gpio.h"
 #include "common.h"
 #include "pinmux.h"
 
@@ -90,8 +91,8 @@
 #define GET_REQUEST_URI 	"/get"
 
 
-#define HOST_NAME       	"18.189.49.139" //"<host name>"
-#define HOST_PORT           8001
+#define HOST_NAME       	"128.30.31.185" //"<host name>"
+#define HOST_PORT           8000
 //#define HOST_NAME       	"httpbin.org" //"<host name>"
 //#define HOST_PORT           80
 
@@ -103,7 +104,7 @@
 
 #define DATA_SIZE			4000
 int data[DATA_SIZE];
-char postDataBuf[25000];
+char postDataBuf[5000];
 #define SPI_IF_BIT_RATE  100000
 int firstSample, secondSample;
 unsigned long ulUserData = 0;
@@ -1285,8 +1286,13 @@ BoardInit(void)
     // XXX Does the stuff below need to be moved?
 
     MAP_PRCMPeripheralClkEnable(PRCM_GSPI,PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_GPIOA1,PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_GPIOA2,PRCM_RUN_MODE_CLK);
 
     MAP_PRCMPeripheralReset(PRCM_GSPI);
+    MAP_PRCMPeripheralReset(PRCM_GPIOA1);
+    MAP_PRCMPeripheralReset(PRCM_GPIOA2);
+
 
 
     //
@@ -1314,16 +1320,30 @@ BoardInit(void)
 }
 
 void pollForSampleFromADC() {
+	// Set Start Pin to high
+	MAP_GPIOPinWrite(GPIOA1_BASE, GPIO_PIN_3, GPIO_PIN_3);
+
+	// Keep reading done pin until it is pulled high by FPGA
+	int yyread = 0;
+	while (yyread > 0) {
+		yyread = (int) MAP_GPIOPinRead(GPIOA1_BASE, GPIO_PIN_2);
+	}
+
+	// Set Start Pin to Low
+	MAP_GPIOPinWrite(GPIOA1_BASE, GPIO_PIN_3, 0);
+
+	// Now we can start reading data
+
 	int sample = 0;
-	int whileLoop = 50;
+	int whileLoop = 500;
 	while(whileLoop > 0)
 	{
 		int i = 0;
 		int counter = 0;
 		// 50 Hz
-		for (i = 0; i < 97656.25; i++) {
-			counter += 1;
-		}
+//		for (i = 0; i < 97656.25; i++) {
+//			counter += 1;
+//		}
 
 		MAP_SPICSEnable(GSPI_BASE);
 		// Push the character over SPI
@@ -1383,10 +1403,31 @@ int main()
     InitializeAppVariables();
 
     lRetVal = ConnectToAP();
+
     if(lRetVal < 0)
     {
         LOOP_FOREVER();
     }
+
+    lRetVal = ConnectToHTTPServer(&httpClient);
+   		 if(lRetVal < 0)
+   		 {
+   			 LOOP_FOREVER();
+   		 }
+
+   		 UART_PRINT("\n\r");
+   		 UART_PRINT("HTTP Post Begin:\n\r");
+   		 lRetVal = HTTPPostMethod(&httpClient);
+   		 if(lRetVal < 0)
+   		 {
+   			UART_PRINT("HTTP Post failed.\n\r");
+   		 }
+   		 UART_PRINT("HTTP Post End:\n\r");
+
+   		 UART_PRINT("\n\r");
+
+   		 DisconnectFromHTTPServer(&httpClient);
+
     int queryNum = 0;
     int num = 0;
 
@@ -1411,8 +1452,8 @@ int main()
 
     	int curIdx = 24 + sizeof(queryNum) + sizeof(num) + numToAdd;
     	int index = 0;
-		  for (index = 0; index < 100; index++) {
-			if (index == 99) {
+		  for (index = 0; index < 500; index++) {
+			if (index == 499) {
 			  sprintf(&postDataBuf[curIdx], "%d]}", data[index]);
 			  curIdx += 6;
 			} else if (index == 0) {
