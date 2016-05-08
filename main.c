@@ -102,9 +102,9 @@
 #define READ_SIZE           1450
 #define MAX_BUFF_SIZE       1460
 
-#define DATA_SIZE			4000
-int data[DATA_SIZE];
-char postDataBuf[5000];
+#define DATA_SIZE			5000
+unsigned long data[DATA_SIZE];
+char postDataBuf[30000];
 #define SPI_IF_BIT_RATE  100000
 int firstSample, secondSample;
 unsigned long ulUserData = 0;
@@ -948,7 +948,7 @@ static int HTTPPostMethod(HTTPCli_Handle httpClient)
 
 
     /* Send POST data/body */
-    lRetVal = HTTPCli_sendRequestBody(httpClient, &postDataBuf[0], (sizeof(postDataBuf)-1));
+    lRetVal = HTTPCli_sendRequestBody(httpClient, &data[0], (sizeof(data)));
     if(lRetVal < 0)
     {
         UART_PRINT("Failed to send HTTP POST request body.\n\r");
@@ -1323,6 +1323,13 @@ void pollForSampleFromADC() {
 	// Set Start Pin to high
 	MAP_GPIOPinWrite(GPIOA1_BASE, GPIO_PIN_3, GPIO_PIN_3);
 
+	// TODO Check this delay. Currently adding in to see if we can get data to flow properly.
+	int i = 0;
+	int counter = 0;
+	for (i = 0; i < 97656.25; i++) {
+		counter += 1;
+	}
+
 	// Keep reading done pin until it is pulled high by FPGA
 	int yyread = 0;
 	while (yyread > 0) {
@@ -1335,11 +1342,11 @@ void pollForSampleFromADC() {
 	// Now we can start reading data
 
 	int sample = 0;
-	int whileLoop = 500;
+	int whileLoop = 5000;
 	while(whileLoop > 0)
 	{
-		int i = 0;
-		int counter = 0;
+//		int i = 0;
+//		int counter = 0;
 		// 50 Hz
 //		for (i = 0; i < 97656.25; i++) {
 //			counter += 1;
@@ -1356,14 +1363,15 @@ void pollForSampleFromADC() {
 		//
 		MAP_SPIDataGet(GSPI_BASE,&ulDummy);
 
-		firstSample = ulDummy >> 16;
-		secondSample = ulDummy & 0xffff;
+//		firstSample = ulDummy >> 16;
+//		secondSample = ulDummy & 0xffff;
+//		secondSample = ulDummy & 0xfff;
 
 //		Report("\nReceived value: 0x%lx\n", ulDummy);
 //		Report("\n\rFirst Sample: %d \n\rSecond Sample: %d", firstSample, secondSample);;
-		data[sample] = firstSample;
-		sample++;
-		data[sample] = secondSample;
+//		data[sample] = firstSample;
+//		sample++;
+		data[sample] = ulDummy;
 		sample++;
 
 		MAP_SPICSDisable(GSPI_BASE);
@@ -1450,21 +1458,20 @@ int main()
     	pollForSampleFromADC();
 
 
-    	int curIdx = 24 + sizeof(queryNum) + sizeof(num) + numToAdd;
-    	int index = 0;
-		  for (index = 0; index < 500; index++) {
-			if (index == 499) {
-			  sprintf(&postDataBuf[curIdx], "%d]}", data[index]);
-			  curIdx += 6;
-			} else if (index == 0) {
-			  sprintf(&postDataBuf[curIdx], "[%d,", data[index]);
-				curIdx+=6;
-			} else {
-			  sprintf(&postDataBuf[curIdx], "%d,", data[index]);
-			  curIdx+= 5;
-			}
-		  }
-
+//    	int curIdx = 24 + sizeof(queryNum) + sizeof(num) + numToAdd;
+//    	int index = 0;
+//		  for (index = 0; index < 5000; index++) {
+//			if (index == 4999) {
+//			  sprintf(&postDataBuf[curIdx], "%lu]}", data[index]);
+//			  curIdx += 12;
+//			} else if (index == 0) {
+//			  sprintf(&postDataBuf[curIdx], "[%lu,", data[index]);
+//				curIdx+=12;
+//			} else {
+//			  sprintf(&postDataBuf[curIdx], "%lu,", data[index]);
+//			  curIdx+= 11;
+//			}
+//		  }
 
 
 		 lRetVal = ConnectToHTTPServer(&httpClient);
